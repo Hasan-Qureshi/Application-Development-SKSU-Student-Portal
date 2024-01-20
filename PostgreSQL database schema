@@ -1,0 +1,73 @@
+Below you'd find all the codes for the database generation: (additionally, helps with understanding table structures and relational properties)
+
+-- Create classrooms table first
+CREATE TABLE classrooms (
+    classroom_id SERIAL PRIMARY KEY,
+    classroom_name VARCHAR(255) NOT NULL
+);
+
+-- Create teachers table next
+CREATE TABLE teachers (
+    teacher_id SERIAL PRIMARY KEY,
+    username VARCHAR(255) NOT NULL,
+    password VARCHAR(255) NOT NULL,
+    classroom_id INT REFERENCES classrooms(classroom_id)
+);
+
+-- Create co_curricular_activities table
+CREATE TABLE co_curricular_activities (
+    activity_id SERIAL PRIMARY KEY,
+    activity_name VARCHAR(255) NOT NULL
+);
+
+-- Create results table
+CREATE TABLE results (
+    result_id SERIAL PRIMARY KEY,
+    student_id INT NOT NULL,
+    pdf_url VARCHAR(255),
+    FOREIGN KEY (student_id) REFERENCES students(student_id)
+);
+
+-- Create students table
+CREATE TABLE students (
+    student_id SERIAL PRIMARY KEY,
+    username VARCHAR(255) NOT NULL,
+    password VARCHAR(255) NOT NULL,
+    name VARCHAR(255) NOT NULL,
+    address TEXT,
+    parents_name VARCHAR(255),
+    parents_contact_no VARCHAR(15),
+    ic_number VARCHAR(20),
+    dob DATE,
+    date_of_entry DATE,
+    classroom_id INT REFERENCES classrooms (classroom_id)
+);
+
+-- Create student_activities table (junction table for many-to-many relationship)
+CREATE TABLE student_activities (
+    student_id INT NOT NULL,
+    activity_id INT NOT NULL,
+    PRIMARY KEY (student_id, activity_id),
+    FOREIGN KEY (student_id) REFERENCES students(student_id),
+    FOREIGN KEY (activity_id) REFERENCES co_curricular_activities(activity_id)
+);
+
+-- Create admins table
+CREATE TABLE admins (
+    admin_id SERIAL PRIMARY KEY,
+    username VARCHAR(255) NOT NULL,
+    password VARCHAR(255) NOT NULL
+);
+
+
+Alterations are as follow:
+ALTER TABLE classrooms
+ADD COLUMN teacher_id INT;
+
+ALTER TABLE teachers
+DROP COLUMN classroom_id;
+
+ALTER TABLE classrooms
+ADD CONSTRAINT fk_teacher
+FOREIGN KEY (teacher_id)
+REFERENCES teachers(teacher_id);
